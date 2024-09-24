@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title }} - {% endif %}{{ site.title }}</title>
+
+  <style>
+    /* Your CSS styles here */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  {% include header.html %}
+
+  <main>
+    {% if page.content %}
+      <article>
+        {{ content }}
+      </article>
+    {% endif %}
+  </main>
+
+  {% include footer.html %}
+
+  <script>
+    // Your JavaScript code here
+    console.log("Hello, world!");
+  </script>
+</body>
+</html>
