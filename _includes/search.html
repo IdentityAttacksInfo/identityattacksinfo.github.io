@@ -1,0 +1,264 @@
+<head>
+  <meta charset="UTF-8">
+  <title>Article Selector</title>
+  <style>
+    .button { 
+      margin: 5px; 
+      padding: 10px; 
+      background-color: #007BFF; 
+      color: white; 
+      border-radius: 5px; 
+      cursor: pointer; 
+    }
+    .button:hover { 
+      background-color: #0056b3; 
+    }
+    .value-button {
+      background-color: #6c757d;
+      border-radius: 5px;
+      margin: 5px; /* Add some margin to space them out */
+    }
+    .value-button:hover {
+      background-color: #5a6268;
+    }
+    .selected { 
+      background-color: #28a745; 
+    }
+    .center-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #search-box {
+      margin-bottom: 10px;
+      width: 50%; /* Adjust the width as needed */
+      padding: 10px; /* Add padding to match buttons */
+      border: 2px solid #007BFF; /* Add border color to match the buttons */
+      border-radius: 5px; /* Rounded corners like buttons */
+      background-color: #f8f9fa; /* Light background color to resemble button style */
+      color: #343a40; /* Text color */
+      font-size: 16px; /* Increase font size to match button text */
+    }
+    #search-box:focus {
+      outline: none; /* Remove default focus outline */
+      background-color: #e2e6ea; /* Slightly darker background on focus */
+      border-color: #0056b3; /* Change border color on focus */
+    }
+    .results-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .results-column {
+      flex: 1;
+      padding: 0 10px;
+    }
+    .link-abstract-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .link-column {
+      flex: 0.6;
+    }
+    .abstract-column {
+      flex: 1.0;
+    }
+    .values-column {
+      flex: 1.4;
+    }
+    .highlight {
+      background-color: yellow; /* Highlight color */
+    }
+    #value-buttons {
+      display: flex;
+      flex-wrap: wrap; /* Make buttons wrap to the next line if necessary */
+      justify-content: center; /* Center horizontally */
+      align-items: center; /* Center vertically */
+      margin-bottom: 20px; /* Add some space between the buttons and the article list */
+    }
+  </style>
+</head>
+<body>
+  <div class="center-container">
+    <div id="key-buttons"></div>
+    <div id="value-buttons"></div>
+    <input type="text" id="search-box" placeholder="...or search directly for keywords included in {{ site.data.articles | size }} articles">
+    <div id="article-links"></div>
+    <ul id="results"></ul>
+   <script>
+     const articles = {{ site.data.articles | jsonify }};
+     const selectedKeys = new Set();
+     const selectedValues = {};
+     const searchBox = document.getElementById('search-box');
+     const resultsContainer = document.getElementById('results');
+     const articleLinksDiv = document.getElementById('article-links');
+
+    // Function to create buttons for keys
+    function createKeyButtons() {
+      const keyButtonsDiv = document.getElementById('key-buttons');
+      Object.keys(articles[0]).forEach(key => {
+        if (key !== 'Link' && key !== 'Title' && key !== 'Abstract') {
+          const button = document.createElement('button');
+          button.className = 'button';
+          button.innerText = key;
+          button.onclick = () => createValueButtons(key, button);
+          keyButtonsDiv.appendChild(button);
+        }
+      });
+    }
+
+    // Function to create buttons for values
+    function createValueButtons(key, keyButton) {
+      const valueButtonsDiv = document.getElementById('value-buttons');
+      valueButtonsDiv.innerHTML = ''; // Clear previous buttons
+      const values = new Set();
+      articles.forEach(article => {
+        if (article[key]) {
+          article[key].split(', ').forEach(value => values.add(value));
+        }
+      });
+      values.forEach(value => {
+        const button = document.createElement('button');
+        button.className = 'button value-button';
+        button.innerText = value;
+        if (selectedValues[key] && selectedValues[key].has(value)) {
+          button.classList.add('selected');
+        }
+        button.onclick = () => toggleValueSelection(key, value, button, keyButton);
+        valueButtonsDiv.appendChild(button);
+      });
+    }
+
+    // Function to toggle value selection
+    function toggleValueSelection(key, value, button, keyButton) {
+      if (!selectedValues[key]) {
+        selectedValues[key] = new Set();
+      }
+      if (selectedValues[key].has(value)) {
+        selectedValues[key].delete(value);
+        button.classList.remove('selected');
+      } else {
+        selectedValues[key].add(value);
+        button.classList.add('selected');
+      }
+      updateKeyButtonState(key, keyButton);
+      showArticleLinks();
+    }
+
+    // Function to update key button state based on value selection
+    function updateKeyButtonState(key, keyButton) {
+      if (selectedValues[key] && selectedValues[key].size > 0) {
+        keyButton.classList.add('selected');
+        selectedKeys.add(key);
+      } else {
+        keyButton.classList.remove('selected');
+        selectedKeys.delete(key);
+      }
+    }
+
+    // Function to show the article links with highlighted matches
+    function showArticleLinks() {
+      articleLinksDiv.innerHTML = ''; // Clear previous links
+      resultsContainer.innerHTML = ''; // Clear previous results
+      const query = searchBox.value.toLowerCase();
+      const isSearchBoxEmpty = query.trim() === '';
+      const areNoButtonsSelected = selectedKeys.size === 0;
+
+      if (isSearchBoxEmpty && areNoButtonsSelected) {
+        return; // Do not display any results if search box is empty and no buttons are selected
+      }
+
+      const filteredArticles = articles.filter(article => {
+        let match = true;
+        for (const key of selectedKeys) {
+          if (selectedValues[key] && selectedValues[key].size > 0) {
+            const articleValues = article[key] ? article[key].split(', ') : [];
+            const intersection = new Set([...selectedValues[key]].filter(x => articleValues.includes(x)));
+            if (intersection.size === 0) {
+              match = false;
+              break;
+            }
+          } else {
+            match = false;
+            break;
+          }
+        }
+        if (query) {
+          match = match && Object.keys(article).some(key => {
+            if (key !== 'Link' && key !== 'Title' && key !== 'Abstract' && article[key]) {
+              return article[key].toString().toLowerCase().includes(query);
+            }
+            return false;
+          });
+        }
+        return match;
+      });
+
+      filteredArticles.forEach(article => {
+        const row = document.createElement('div');
+        row.className = 'results-row';
+
+        const linkAbstractColumn = document.createElement('div');
+        linkAbstractColumn.className = 'results-column link-abstract-column';
+
+        const link = document.createElement('a');
+        link.href = article.Link;
+        link.innerText = article.Title;
+        link.target = '_blank';
+        linkAbstractColumn.appendChild(link);
+
+        const author = document.createElement('p');
+        author.innerText = `Author: ${article.Author}`;
+        linkAbstractColumn.appendChild(author);
+
+        const abstract = document.createElement('p');
+        abstract.innerText = highlightMatch(article.Abstract, query);
+        linkAbstractColumn.appendChild(abstract);
+
+        const valuesColumn = document.createElement('div');
+        valuesColumn.className = 'results-column values-column';
+        Object.keys(article).forEach(key => {
+          if (key !== 'Link' && key !== 'Title' && key !== 'Abstract' && key !== 'Author' && article[key]) {
+            const highlightedValues = highlightSelectedValues(key, article[key]);
+            const value = document.createElement('p');
+            value.innerHTML = highlightMatch(`${key}: ${highlightedValues}`, query);
+            valuesColumn.appendChild(value);
+          }
+        });
+
+        row.appendChild(linkAbstractColumn);
+        row.appendChild(valuesColumn);
+        resultsContainer.appendChild(row);
+      });
+    }
+
+    // Function to highlight the matching text from the search box
+    function highlightMatch(text, query) {
+      if (!query || query.trim() === '') {
+        return text;
+      }
+      const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special characters
+      const regex = new RegExp(`(${escapedQuery})`, 'gi');	    
+      return text.replace(regex, '<span class="highlight">$1</span>');
+    }
+
+    // Function to highlight the selected values from value buttons
+    function highlightSelectedValues(key, text) {
+      if (!selectedValues[key] || selectedValues[key].size === 0) {
+        return text; // No values selected for this key
+      }
+      selectedValues[key].forEach(value => {
+        const escapedValue = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special characters
+        const regex = new RegExp(`(${escapedValue})`, 'gi');
+        text = text.replace(regex, '<span class="highlight">$1</span>');
+      });
+      return text;
+    }
+
+    // Initialize key buttons on page load
+    createKeyButtons();
+    // Add event listener for search box
+    searchBox.addEventListener('input', showArticleLinks);
+  </script>
+
