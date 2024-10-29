@@ -12,7 +12,7 @@
     "Scopes(permissions)": "",
     "Roles": "",
     "Link": "https://labs.jumpsec.com/how-cloud-migration-is-affecting-appsec-a-red-teamers-perspective/",
-    "Title": "How Cloud Migration is Affecting AppSec - A Red Teamer's Perspective",
+    "Title": "How Cloud Migration is Affecting AppSec - A Red Teamer�s Perspective",
     "Author": "Max Corbridge",
     "Abstract": "Cloud migration has made AppSec more critical than ever. Attackers' techniques from on-prem environments can have even more serious consequences when targeting cloud applications. This article demonstrates how metadata can be abused in AWS, GCP, and Azure."
   },
@@ -185,5 +185,39 @@
     "Title": "Abusing FIDO2 passkeys to take over Global Administrators in Entra ID",
     "Author": "Max Rozendaal",
     "Abstract": "An attacker controlling a service principal with the appropriate permissions can bypass the requirement for a user's plaintext password and MFA by provisioning a FIDO2 for a Global Administrator. We are likely to see more applications for FIDO2 provisioning in the future."
+  },
+  {
+    "Protocol(s)": "Oauth2",
+    "Auth Flow(s)": "",
+    "Environment": "EntraID",
+    "IdP": "EntraID",
+    "Identity type(s)": "",
+    "Secret type(s)": "certificate, federated",
+    "Token type(s)": "",
+    "Attack tactics": "Privilege Escalation, Persistence",
+    "Other tags": "Certificate-Based Authentication, CBA, certificate, passwordless, Certificate Authority, trust boundary, federated identity, X509, Security Token Service, STS, Certificate Signing Request, PATCH request, MFA, Conditional Access Policies, CAP",
+    "Scopes(permissions)": "Policy.ReadWrite.AuthenticationMethod, Organization.ReadWrite.All",
+    "Roles": "Authentication Policy Administrator",
+    "Link": "https://posts.specterops.io/passwordless-persistence-and-privilege-escalation-in-azure-98a01310be3f",
+    "Title": "Passwordless Persistence and Privilege Escalation in Azure",
+    "Author": "Andy Robbins",
+    "Abstract": "Once Certificate-Based Authentication is configured, an adversary with control of the Certificate Authority can log into the Azure tenant as any user without their password. Yet another argument for proper usage of Multi-Factor Authentication and Conditional Access Policies."
+  },
+  {
+    "Protocol(s)": "Oauth2",
+    "Auth Flow(s)": "",
+    "Environment": "EntraID",
+    "IdP": "EntraID",
+    "Identity type(s)": "",
+    "Secret type(s)": "",
+    "Token type(s)": "",
+    "Attack tactics": "Initial Access, Privilege Escalation",
+    "Other tags": "Midnight Blizzard, consent to OAuth applications, app registration, BARK, Tier Zero ServicePrincipals, trust boundary",
+    "Scopes(permissions)": "AppRoleAssignment.ReadWrite.All, RoleManagement.ReadWrite.Directory, Directory.ReadWrite.All, User.ReadWrite.All, Application.ReadWrite.All, Group.ReadWrite.All, GroupMember.ReadWrite.All, ServicePrincipalEndpoint.ReadWrite.All",
+    "Roles": "Application Administrator, Cloud Application Administrator, Directory Synchronization Accounts, Global Administrator, Hybrid Identity Administrator, Partner Tier1 Support, Partner Tier2 Support, Privileged Role Administrator, Directory Writers, User Administrator",
+    "Link": "https://posts.specterops.io/microsoft-breach-what-happened-what-should-azure-admins-do-da2b7e674ebc",
+    "Title": "Microsoft Breach - What Happened? What Should Azure Admins Do?",
+    "Author": "Andy Robbins",
+    "Abstract": "Excellent explanation of the Midnight Blizzard attack on Microsoft and the steps administrators and defenders can take to protect against similar threats. It clearly illustrates how privileged foreign applications can traverse trust boundaries between tenants."
   }
 ]
