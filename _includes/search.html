@@ -115,19 +115,29 @@
       const values = new Set();
       articles.forEach(article => {
         if (article[key]) {
-          article[key].split(', ').forEach(value => values.add(value));
-        }
-      });
-      values.forEach(value => {
-        const button = document.createElement('button');
-        button.className = 'button value-button';
-        button.innerText = value;
-        if (selectedValues[key] && selectedValues[key].has(value)) {
-          button.classList.add('selected');
-        }
-        button.onclick = () => toggleValueSelection(key, value, button, keyButton);
-        valueButtonsDiv.appendChild(button);
-      });
+          article[key].split(', ').forEach(value => {
+            if (key === "Other tags") {
+              values.add(value.toLowerCase());
+          } else {
+              values.add(value);
+          }
+        });
+      }
+    });
+
+    // Convert the set to an array and sort it alphabetically
+    const sortedValues = Array.from(values).sort((a, b) => a.localeCompare(b));
+
+    sortedValues.forEach(value => {
+      const button = document.createElement('button');
+      button.className = 'button value-button';
+      button.innerText = value;
+      if (selectedValues[key] && selectedValues[key].has(value)) {
+        button.classList.add('selected');
+      }
+      button.onclick = () => toggleValueSelection(key, value, button, keyButton);
+      valueButtonsDiv.appendChild(button);
+    });
     }
 
     // Function to toggle value selection
@@ -135,6 +145,7 @@
       if (!selectedValues[key]) {
         selectedValues[key] = new Set();
       }
+      const transformedValue = key === "Other tags" ? value.toLowerCase() : value;
       if (selectedValues[key].has(value)) {
         selectedValues[key].delete(value);
         button.classList.remove('selected');
@@ -174,7 +185,8 @@
         for (const key of selectedKeys) {
           if (selectedValues[key] && selectedValues[key].size > 0) {
             const articleValues = article[key] ? article[key].split(', ') : [];
-            const intersection = new Set([...selectedValues[key]].filter(x => articleValues.includes(x)));
+            const transformedValues = key === "Other tags" ? articleValues.map(v => v.toLowerCase()) : articleValues;
+            const intersection = new Set([...selectedValues[key]].filter(x => transformedValues.includes(key === "Other tags" ? x.toLowerCase() : x)));
             if (intersection.size === 0) {
               match = false;
               break;
