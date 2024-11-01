@@ -12,7 +12,7 @@
     "Scopes(permissions)": "",
     "Roles": "",
     "Link": "https://labs.jumpsec.com/how-cloud-migration-is-affecting-appsec-a-red-teamers-perspective/",
-    "Title": "How Cloud Migration is Affecting AppSec - A Red Teamer�s Perspective",
+    "Title": "How Cloud Migration is Affecting AppSec - A Red Teamer's Perspective",
     "Author": "Max Corbridge",
     "Abstract": "Cloud migration has made AppSec more critical than ever. Attackers' techniques from on-prem environments can have even more serious consequences when targeting cloud applications. This article demonstrates how metadata can be abused in AWS, GCP, and Azure."
   },
